@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/models/user_model.dart';
-import '../../../core/services/auth_service.dart';
 import '../../../core/services/api_service.dart';
 
 class SearchPage extends StatefulWidget {
@@ -13,7 +12,6 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
-  final AuthService _authService = AuthService();
   final ApiService _apiService = ApiService();
 
   List<UserModel> _searchResults = [];
