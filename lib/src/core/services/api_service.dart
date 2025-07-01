@@ -104,8 +104,10 @@ class ApiService {
         headers: headers,
       );
       
+      
       if (response.statusCode == 200) {
         final List<dynamic> jsonData = json.decode(response.body);
+        print('Search response: ${response.body}');
         return jsonData.map((json) => UserModel.fromJson(json)).toList();
       } else if (response.statusCode == 401) {
         // Token expired, try to refresh

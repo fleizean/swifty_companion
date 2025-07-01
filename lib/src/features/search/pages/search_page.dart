@@ -627,67 +627,36 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                               overflow: TextOverflow.ellipsis,
                             ),
                             // Level gösterimi - düzeltilmiş
-                            if (user.level > 0) ...[
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.trending_up,
-                                    size: 16,
-                                    color: const Color(0xFF00d4ff),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Level ${user.level.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFF00d4ff),
-                                      fontWeight: FontWeight.w500,
+                            if (user.kind == 'student' || user.kind == 'admin') ...[
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Icon(
+                                      user.kind == 'student' ? Icons.school : Icons.admin_panel_settings,
+                                      size: 16,
+                                      color: user.kind == 'student' ? Color(0xFF00d4ff) : Color(0xFFFF9800),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ] else if (user.skills.isNotEmpty) ...[
-                              // Level yoksa skill sayısını göster
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.star,
-                                    size: 16,
-                                    color: const Color(0xFFFFD700),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    '${user.skills.length} Skills',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFFFFD700),
-                                      fontWeight: FontWeight.w500,
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      user.kind == 'student' ? 'Student' : 'Admin',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: user.kind == 'student' ? Color(0xFF00d4ff) : Color(0xFFFF9800),
+                                        fontWeight: FontWeight.w500,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ] else if (user.poolYear != null) ...[
-                              // Pool year'ı göster
+                                  ],
+                                ),
+                              ]
+
+                            else ...[
                               const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.pool,
-                                    size: 16,
-                                    color: const Color(0xFF7209b7),
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Pool ${user.poolYear}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Color(0xFF7209b7),
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                'No level information',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.white.withOpacity(0.6),
+                                ),
                               ),
                             ],
                           ],

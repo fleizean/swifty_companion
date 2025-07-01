@@ -15,6 +15,7 @@ class UserModel {
     required this.cursusUsers,
     this.phone,
     this.imageUrl,
+    this.kind,
     this.poolYear,
     this.poolMonth,
     this.location,
@@ -103,6 +104,7 @@ class UserModel {
       poolMonth: json['pool_month'] as String?,
       level: level,
       skills: finalSkillModels,
+      kind: json['kind'] as String? ?? 'student', // Default to 'student'
       achievements: finalAchievementModels,
       location: json['location'] as String?,
       isActive: json['active?'] == true,
@@ -128,6 +130,7 @@ class UserModel {
   final int wallet;
   final String? poolYear;
   final String? poolMonth;
+  final String? kind; // Default to 'student' if not present
   final double level;
   final List<SkillModel> skills;
   final List<AchievementModel> achievements;

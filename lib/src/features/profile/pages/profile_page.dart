@@ -383,7 +383,7 @@ class _ProfilePageState extends State<ProfilePage>
   }
 }
 
-Widget _buildModernLoadingDialog() {
+ Widget _buildModernLoadingDialog() {
   return AlertDialog(
     backgroundColor: const Color(0xFF16213e),
     content: Row(
