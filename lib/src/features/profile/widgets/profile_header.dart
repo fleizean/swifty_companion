@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:peer42/src/features/profile/widgets/profile_stats.dart';
 import '../../../core/models/user_model.dart';
 import '../../../core/models/coalition_model.dart';
@@ -7,11 +8,13 @@ import '../../../core/models/coalition_model.dart';
 class FuturisticProfileHeader extends StatelessWidget {
   final UserModel user;
   final CoalitionModel? coalition;
+  final VoidCallback? onCoalitionTap;
 
   const FuturisticProfileHeader({
     super.key,
     required this.user,
     this.coalition,
+    this.onCoalitionTap,
   });
 
   @override
@@ -111,34 +114,76 @@ class FuturisticProfileHeader extends StatelessWidget {
           Positioned(
             bottom: 0,
             right: 0,
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: _getCoalitionColor(),
-                border: Border.all(
-                  color: Colors.white,
-                  width: 3,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: _getCoalitionColor().withOpacity(0.5),
-                    blurRadius: 10,
-                    spreadRadius: 2,
+            child: GestureDetector(
+              onTap: onCoalitionTap,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _getCoalitionColor(),
+                  border: Border.all(
+                    color: Colors.white,
+                    width: 3,
                   ),
-                ],
-              ),
-              child: const Icon(
-                Icons.shield,
-                color: Colors.white,
-                size: 20,
+                  boxShadow: [
+                    BoxShadow(
+                      color: _getCoalitionColor().withOpacity(0.5),
+                      blurRadius: 10,
+                      spreadRadius: 2,
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: _buildCoalitionImage(coalition!.imageUrl),
+                ),
               ),
             ),
           ),
       ],
     );
   }
+
+  Widget _buildCoalitionImage(String imageUrl) {
+  if (imageUrl.toLowerCase().endsWith('.svg')) {
+    // Handle SVG
+    return SvgPicture.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      placeholderBuilder: (context) => Container(
+        color: Colors.transparent,
+        child: const Icon(
+          Icons.shield,
+          color: Colors.white,
+          size: 20,
+        ),
+      ),
+    );
+  } else {
+    // Handle regular images  
+    return CachedNetworkImage(
+      imageUrl: imageUrl,
+      fit: BoxFit.cover,
+      placeholder: (context, url) => Container(
+        color: Colors.transparent,
+        child: const Icon(
+          Icons.shield,
+          color: Colors.white,
+          size: 20,
+        ),
+      ),
+      errorWidget: (context, url, error) => Container(
+        color: Colors.transparent,
+        child: const Icon(
+          Icons.shield,
+          color: Colors.white,
+          size: 20,
+        ),
+      ),
+    );
+  }
+}
+
 
   Widget _buildUserInfo() {
     return Column(
@@ -188,6 +233,21 @@ class FuturisticProfileHeader extends StatelessWidget {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildCoalitionBadge() {
+    if (coalition == null) return SizedBox();
+    
+    return GestureDetector(
+      onTap: onCoalitionTap,
+      child: Container(
+        // Your existing container styling
+        child: Image.network(
+          coalition!.imageUrl,
+          // Your existing image styling
+        ),
+      ),
     );
   }
 

@@ -274,6 +274,9 @@ class _ProfilePageState extends State<ProfilePage>
                                 FuturisticProfileHeader(
                                   user: _user!,
                                   coalition: _coalition,
+                                  onCoalitionTap: () {
+                                    _showCoalitionDetails();
+                                  },
                                 ),
                                 const SizedBox(height: 24),
                                 FuturisticTabBar(
@@ -338,6 +341,176 @@ class _ProfilePageState extends State<ProfilePage>
       ),
     );
   }
+
+  void _showCoalitionDetails() {
+  if (_coalition == null) return;
+  
+  showDialog(
+    context: context,
+    builder: (context) => Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        width: double.maxFinite,
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Color(0xFF16213e),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: Color(_coalition!.colorValue).withOpacity(0.5),
+            width: 2,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Coalition Header
+            Row(
+              children: [
+                Container(
+                  height: 60,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Image.network(
+                    _coalition!.imageUrl,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _coalition!.name,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'Score: ${_coalition!.score}',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Color(_coalition!.colorValue),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            
+            // Members List (if available)
+            if (_coalition!.users != null && _coalition!.users!.isNotEmpty)
+              Container(
+                margin: const EdgeInsets.only(top: 20),
+                height: 300,
+                child: ListView.builder(
+                  itemCount: _coalition!.users!.length,
+                  itemBuilder: (context, index) {
+                    final user = _coalition!.users![index];
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.05),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: user.userImageUrl != null
+                                ? NetworkImage(user.userImageUrl!)
+                                : null,
+                            child: user.userImageUrl == null
+                                ? Text(user.userLogin[0].toUpperCase())
+                                : null,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  user.userDisplayName,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                Text(
+                                  'Level ${user.userLevel.toStringAsFixed(1)}',
+                                  style: TextStyle(
+                                    color: Colors.white.withOpacity(0.7),
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Color(_coalition!.colorValue).withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Score: ${user.score}',
+                              style: TextStyle(
+                                color: Color(_coalition!.colorValue),
+                                fontWeight: FontWeight.w600,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20),
+                child: Text(
+                  'No members data available',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              
+            // Close button
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Close',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: TextButton.styleFrom(
+                  backgroundColor: Color(_coalition!.colorValue).withOpacity(0.3),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
   Widget _buildErrorScreen() {
     return Scaffold(

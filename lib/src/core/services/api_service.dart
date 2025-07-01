@@ -187,54 +187,72 @@ class ApiService {
 
   
   /// Get user's coalition information
-  Future<CoalitionModel?> getUserCoalition(String userId) async {
+    Future<CoalitionModel?> getUserCoalition(String login) async {
     try {
-      final headers = await _getHeaders();
+      final data = await _get('/users/$login/coalitions');
       
-      final response = await http.get(
-        Uri.parse('$_baseUrl/users/$userId/coalitions'),
-        headers: headers,
-      );
-      
-      if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        if (jsonData.isNotEmpty) {
-          return CoalitionModel.fromJson(jsonData.first);
-        }
-        return null;
-      } else if (response.statusCode == 401) {
-        await _oauth2Service.logout();
-        throw Exception('Authentication expired. Please login again.');
-      } else {
-        throw Exception('Failed to get coalition: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('Failed to get coalition: $e');
-    }
-  }
-
-   /// Get user's coalition user data (score and rank)
-  Future<CoalitionUserModel?> getUserCoalitionUser(String login) async {
-    try {
-      final data = await _get('/users/$login/coalitions_users');
       if (data is List && data.isNotEmpty) {
-        // Find the coalition user data that matches the active coalition
-        // Typically this is the one with the highest score or most recent
-        final sortedData = List<Map<String, dynamic>>.from(data)
-          ..sort((a, b) {
-            final scoreA = (a['score'] as num?)?.toInt() ?? 0;
-            final scoreB = (b['score'] as num?)?.toInt() ?? 0;
-            return scoreB.compareTo(scoreA);
-          });
-        
-        return CoalitionUserModel.fromJson(sortedData.first);
-      } else if (data is Map<String, dynamic>) {
-        // In case the API returns a single object
-        return CoalitionUserModel.fromJson(data);
+        // En aktif coalition'ı seç (genelde ilk olan)
+        print('🔍 DEBUG: User coalitions data: $data');
+
+        getCoalitionWithUsers(data.first['id']);
+        return CoalitionModel.fromJson(data.first);
       }
       return null;
     } catch (e) {
-      //print('Error getting coalition user data: $e');
+      print('Failed to get user coalition: $e');
+      return null;
+    }
+  }
+
+  /// Get coalition details with users (for modal)
+  Future<CoalitionModel?> getCoalitionWithUsers(int coalitionId) async {
+    try {
+      // Ana coalition bilgisini al
+      final coalitionData = await _get('/coalitions/$coalitionId');
+
+      print('🔍 DEBUG: Coalition data type: ${coalitionData.runtimeType}');
+      
+      if (coalitionData is Map<String, dynamic>) {
+        // Coalition users'ı al - düzeltilmiş endpoint
+        final usersResponse = await _get('/coalitions/$coalitionId/coalitions_users?per_page=50');
+        print('🔍 DEBUG: Coalition users response: $usersResponse');
+        List<CoalitionUserModel> usersList = [];
+        if (usersResponse is List && usersResponse.isNotEmpty) {
+          // Her coalition user için user bilgilerini de al
+          for (var coalitionUserData in usersResponse.take(20)) { // İlk 20 kullanıcı
+            try {
+              if (coalitionUserData['user_id'] != null) {
+                final userData = await _get('/users/${coalitionUserData['user_id']}');
+                if (userData != null) {
+                  coalitionUserData['user'] = userData;
+                  print('🔍 DEBUG: User data loaded for coalition user: ${coalitionUserData['user_id']}');
+                }
+              }
+              usersList.add(CoalitionUserModel.fromJson(coalitionUserData));
+            } catch (e) {
+              print('Error loading user data: $e');
+              // User bilgisi yoksa sadece coalition user bilgisiyle devam et
+              usersList.add(CoalitionUserModel.fromJson(coalitionUserData));
+            }
+          }
+        }
+        
+        // Coalition data'ya users'ı ekle
+        coalitionData['users'] = usersList.map((u) => {
+          'id': u.id,
+          'score': u.score,
+          'rank': u.rank,
+          'coalition_id': u.coalitionId,
+          'user_id': u.userId,
+          'user': u.user,
+        }).toList();
+        
+        return CoalitionModel.fromJson(coalitionData);
+      }
+      return null;
+    } catch (e) {
+      print('Failed to get coalition with users: $e');
       return null;
     }
   }
