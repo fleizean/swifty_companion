@@ -38,7 +38,7 @@ class InitialSetupPage extends StatelessWidget {
                     
                     // Welcome Text
                     Text(
-                      'Welcome to peer42',
+                      'Welcome to Peer42',
                       style: theme.textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
