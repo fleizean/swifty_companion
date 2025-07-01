@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../core/services/settings_service.dart';
 import '../../../core/services/oauth2_service.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -12,11 +11,9 @@ class SettingsPage extends StatefulWidget {
 
 class SettingsPageState extends State<SettingsPage>
     with TickerProviderStateMixin {
-  final _settingsService = SettingsService();
   final _oauth2Service = OAuth2Service();
 
   bool _isLoading = false;
-  bool _isPerformanceMode = false;
   late AnimationController _backgroundController;
   late Animation<double> _backgroundAnimation;
 

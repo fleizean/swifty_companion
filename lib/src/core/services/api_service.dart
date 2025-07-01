@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:peer42/src/core/models/coalition_user_model.dart';
 import '../models/user_model.dart';
 import '../models/coalition_model.dart';
 import '../models/project_model.dart';
@@ -61,10 +62,7 @@ class ApiService {
     
     // Eğer achievements boşsa diğer field'ları kontrol et
     if (achievements.isEmpty) {
-      // Titles kontrol et
-      if (userData['titles'] != null) {
-        final titles = userData['titles'] as List? ?? [];
-      }
+
       
       // Titles_users kontrol et  
       if (userData['titles_users'] != null) {
@@ -214,6 +212,32 @@ class ApiService {
       throw Exception('Failed to get coalition: $e');
     }
   }
+
+   /// Get user's coalition user data (score and rank)
+  Future<CoalitionUserModel?> getUserCoalitionUser(String login) async {
+    try {
+      final data = await _get('/users/$login/coalitions_users');
+      if (data is List && data.isNotEmpty) {
+        // Find the coalition user data that matches the active coalition
+        // Typically this is the one with the highest score or most recent
+        final sortedData = List<Map<String, dynamic>>.from(data)
+          ..sort((a, b) {
+            final scoreA = (a['score'] as num?)?.toInt() ?? 0;
+            final scoreB = (b['score'] as num?)?.toInt() ?? 0;
+            return scoreB.compareTo(scoreA);
+          });
+        
+        return CoalitionUserModel.fromJson(sortedData.first);
+      } else if (data is Map<String, dynamic>) {
+        // In case the API returns a single object
+        return CoalitionUserModel.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      //print('Error getting coalition user data: $e');
+      return null;
+    }
+  }
   
   /// Get user's projects
   Future<List<ProjectModel>> getUserProjects(String userId) async {
@@ -276,6 +300,28 @@ class ApiService {
       return response.statusCode == 200;
     } catch (e) {
       return false;
+    }
+  }
+
+  Future<List<CoalitionUserModel?>> getAllCoalitions() async {
+    try {
+      final headers = await _getHeaders();
+      final response = await http.get(
+        Uri.parse('$_baseUrl/coalitions'),
+        headers: headers,
+      );
+      
+      if (response.statusCode == 200) {
+        final List<dynamic> jsonData = json.decode(response.body);
+        return jsonData.map((json) => CoalitionUserModel.fromJson(json)).toList();
+      } else if (response.statusCode == 401) {
+        await _oauth2Service.logout();
+        throw Exception('Authentication expired. Please login again.');
+      } else {
+        throw Exception('Failed to get coalitions: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Failed to get coalitions: $e');
     }
   }
 }
