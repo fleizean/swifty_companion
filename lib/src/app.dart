@@ -26,7 +26,7 @@ class Peer42App extends StatelessWidget {
     );
 
     return MaterialApp(
-      title: 'peer42',
+      title: 'Peer42',
       debugShowCheckedModeBanner: false,
       theme: AppTheme().darkTheme,
       navigatorKey: AppNavigator.navigatorKey,
@@ -117,7 +117,7 @@ class SplashScreenState extends State<SplashScreen> {
               
               // App Name
               Text(
-                'peer42',
+                'Peer42',
                 style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
