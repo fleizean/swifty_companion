@@ -199,33 +199,77 @@ class ApiService {
     }
   }
 
+  Future<List<Map<String, dynamic>>> fetchAllCoalitionUsers(int coalitionId) async {
+      int page = 1;
+      int pageSize = 100;
+      bool hasMore = true;
+      List<Map<String, dynamic>> allUsers = [];
+
+      while (hasMore) {
+        final response = await _get('/coalitions/$coalitionId/coalitions_users?page[size]=$pageSize&page[number]=$page');
+
+        if (response is List) {
+          final users = List<Map<String, dynamic>>.from(response);
+          allUsers.addAll(users);
+          hasMore = users.length == pageSize;
+          page++;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      return allUsers;
+    }
+
+
   /// Get coalition details with users (for modal)
-  Future<CoalitionUserModel?> getCoalitionWithUsers(String login) async {
-    try {
+  Future<CoalitionModel?> getCoalitionWithUsers(int coalitionId) async {
+  try {
+    // 1. Önce coalition'ın temel bilgilerini al
+    final coalitionData = await _get('/coalitions/$coalitionId');
+    
+    if (coalitionData is Map<String, dynamic>) {
+      // 2. Coalition'daki kullanıcıları al
+      final allUsers = await fetchAllCoalitionUsers(coalitionId);
       
-      // Ana coalition bilgisini al
-      final data = await _get('/users/$login/coalitions_users');
-      
-      if (data is List && data.isNotEmpty) {
-        final sortedData = List<Map<String, dynamic>>.from(data)
+      // 3. Users verisini coalition verisine ekle
+      if (allUsers is List && allUsers.isNotEmpty) {
+        // Users listesini score'a göre sırala (en yüksek önce)
+        final sortedUsers = List<Map<String, dynamic>>.from(allUsers)
           ..sort((a, b) {
             final scoreA = (a['score'] as num?)?.toInt() ?? 0;
             final scoreB = (b['score'] as num?)?.toInt() ?? 0;
             return scoreB.compareTo(scoreA);
           });
-          return CoalitionUserModel.fromJson(sortedData.first);
+        
+        final topUsers = sortedUsers.take(5).toList();
+
+
+        for (var user in topUsers) {
+          final userId = user['user_id'];
+          if (userId != null) {
+            try {
+              final userDetails = await _get('/users/$userId');
+              user['user'] = userDetails;
+            } catch (_) {
+              // Kullanıcı bilgisi çekilemezse boş bırak
+              user['user'] = null;
+            }
+          }
+        }
+        // Coalition verisine users'ı ekle
+        coalitionData['users'] = topUsers;
       }
-      else if (data is Map<String, dynamic>) {
-        // In case the API returns a single object
-        return CoalitionUserModel.fromJson(data);
-      }
-      return null;
+      
+      return CoalitionModel.fromJson(coalitionData);
     }
-    catch (e) {
-      //print('Error getting coalition user data: $e');
-      return null;
-    }
+    
+    return null;
+  } catch (e) {
+    print('Error getting coalition with users: $e');
+    return null;
   }
+}
 
   
   /// Get user's projects

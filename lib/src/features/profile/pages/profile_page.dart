@@ -371,7 +371,7 @@ class _ProfilePageState extends State<ProfilePage>
         context: context,
         isScrollControlled: true,
         backgroundColor: Colors.transparent,
-        builder: (context) => CoalitionUser(coalition: coalitionWithUsers),
+        builder: (context) => CoalitionModal(coalition: coalitionWithUsers),
       );
     } else if (mounted) {
       _showErrorDialog('Failed to load coalition details');
@@ -384,140 +384,21 @@ class _ProfilePageState extends State<ProfilePage>
 }
 
 Widget _buildModernLoadingDialog() {
-  return Center(
-    child: Container(
-      width: 200,
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            Colors.white.withOpacity(0.1),
-            Colors.white.withOpacity(0.05),
-          ],
+  return AlertDialog(
+    backgroundColor: const Color(0xFF16213e),
+    content: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF00d4ff)),
+          strokeWidth: 2,
         ),
-        border: Border.all(
-          color: Colors.white.withOpacity(0.2),
-          width: 1,
+        const SizedBox(width: 16),
+        const Text(
+          'Loading coalition details...',
+          style: TextStyle(color: Colors.white70),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00d4ff).withOpacity(0.3),
-            blurRadius: 30,
-            spreadRadius: 5,
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Animated Coalition Logo
-          TweenAnimationBuilder<double>(
-            duration: const Duration(seconds: 2),
-            tween: Tween(begin: 0.0, end: 1.0),
-            builder: (context, value, child) {
-              return Transform.rotate(
-                angle: value * 2 * 3.14159, // Full rotation
-                child: Container(
-                  width: 60,
-                  height: 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        Color(_coalition?.colorValue ?? 0xFF00d4ff),
-                        Color(_coalition?.colorValue ?? 0xFF00d4ff).withOpacity(0.7),
-                        const Color(0xFF7209b7),
-                      ],
-                      stops: [0.0, 0.5, 1.0],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(_coalition?.colorValue ?? 0xFF00d4ff).withOpacity(0.5),
-                        blurRadius: 20,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.shield,
-                    color: Colors.white,
-                    size: 30,
-                  ),
-                ),
-              );
-            },
-          ),
-          
-          const SizedBox(height: 24),
-          
-          // Pulsing progress indicator
-          TweenAnimationBuilder<double>(
-            duration: const Duration(milliseconds: 1500),
-            tween: Tween(begin: 0.8, end: 1.2),
-            builder: (context, value, child) {
-              return Transform.scale(
-                scale: value,
-                child: Container(
-                  width: 4,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: LinearGradient(
-                      colors: [
-                        const Color(0xFF00d4ff),
-                        Color(_coalition?.colorValue ?? 0xFF7209b7),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Animated text
-          TweenAnimationBuilder<double>(
-            duration: const Duration(milliseconds: 2000),
-            tween: Tween(begin: 0.0, end: 1.0),
-            builder: (context, value, child) {
-              return Opacity(
-                opacity: (value * 2).clamp(0.0, 1.0),
-                child: ShaderMask(
-                  shaderCallback: (bounds) => LinearGradient(
-                    colors: [
-                      const Color(0xFF00d4ff),
-                      Color(_coalition?.colorValue ?? 0xFF7209b7),
-                    ],
-                  ).createShader(bounds),
-                  child: const Text(
-                    'Loading Coalition...',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-          
-          const SizedBox(height: 8),
-          
-          // Subtitle
-          Text(
-            'Gathering members data',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.white.withOpacity(0.6),
-            ),
-          ),
-        ],
-      ),
+      ],
     ),
   );
 }

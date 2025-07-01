@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../core/models/coalition_user_model.dart';
+import '../../../core/models/coalition_model.dart';
 
 class CoalitionModal extends StatelessWidget {
-  final CoalitionUserModel coalition;
+  final CoalitionModel coalition;
 
   const CoalitionModal({
     super.key,
@@ -13,7 +13,6 @@ class CoalitionModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final bottomSafeArea = MediaQuery.of(context).padding.bottom;
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
@@ -34,29 +33,28 @@ class CoalitionModal extends StatelessWidget {
         bottom: true,
         child: Column(
           children: [
-          // Handle bar
-          Container(
-            margin: const EdgeInsets.only(top: 12),
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(2),
+            // Handle bar
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
-          ),
-          
-          // Header
-          _buildHeader(),
-          
-          // Users List
-          Expanded(
-            child: Padding(
-              // Add bottom padding to the list
-              padding: EdgeInsets.only(bottom: bottomSafeArea > 0 ? 0 : 20),
-              child: _buildUsersList(),
+            
+            // Header
+            _buildHeader(),
+            
+            // Users List
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(bottom: bottomSafeArea > 0 ? 0 : 20),
+                child: _buildUsersList(),
+              ),
             ),
-          ),
-        ],
+          ],
         ),
       ),
     );
@@ -68,52 +66,52 @@ class CoalitionModal extends StatelessWidget {
       child: Column(
         children: [
           // Coalition Logo
-            Container(
+          Container(
             width: 80,
             height: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
-              colors: [
-                Color(coalition.colorValue),
-                Color(coalition.colorValue).withOpacity(0.7),
-              ],
+                colors: [
+                  Color(coalition.colorValue),
+                  Color(coalition.colorValue).withValues(alpha: 0.7),
+                ],
               ),
               boxShadow: [
-              BoxShadow(
-                color: Color(coalition.colorValue).withOpacity(0.3),
-                blurRadius: 20,
-                spreadRadius: 2,
-              ),
+                BoxShadow(
+                  color: Color(coalition.colorValue).withValues(alpha: 0.3),
+                  blurRadius: 20,
+                  spreadRadius: 2,
+                ),
               ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: coalition.imageUrl != null && coalition.imageUrl!.isNotEmpty
-              ? SvgPicture.network(
-                coalition.imageUrl!,
-                fit: BoxFit.cover,
-                placeholderBuilder: (context) => Center(
-                  child: Text(
-                  coalition.name.isNotEmpty ? coalition.name[0].toUpperCase() : 'C',
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  ),
-                ),
-                )
-              : Center(
-                child: Text(
-                  coalition.name.isNotEmpty ? coalition.name[0].toUpperCase() : 'C',
-                  style: const TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                  ),
-                ),
-                ),
+              child: coalition.imageUrl.isNotEmpty
+                  ? SvgPicture.network(
+                      coalition.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholderBuilder: (context) => Center(
+                        child: Text(
+                          coalition.name.isNotEmpty ? coalition.name[0].toUpperCase() : 'C',
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    )
+                  : Center(
+                      child: Text(
+                        coalition.name.isNotEmpty ? coalition.name[0].toUpperCase() : 'C',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
             ),
           ),
           const SizedBox(height: 16),
@@ -123,7 +121,7 @@ class CoalitionModal extends StatelessWidget {
             shaderCallback: (bounds) => LinearGradient(
               colors: [
                 Color(coalition.colorValue),
-                Color(coalition.colorValue).withOpacity(0.7),
+                Color(coalition.colorValue).withValues(alpha: 0.7),
               ],
             ).createShader(bounds),
             child: Text(
@@ -142,7 +140,7 @@ class CoalitionModal extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
-              color: Color(coalition.colorValue).withOpacity(0.2),
+              color: Color(coalition.colorValue).withValues(alpha: 0.2),
               border: Border.all(
                 color: Color(coalition.colorValue),
                 width: 1,
@@ -173,14 +171,14 @@ class CoalitionModal extends StatelessWidget {
             Icon(
               Icons.people_outline,
               size: 60,
-              color: Colors.white.withOpacity(0.3),
+              color: Colors.white.withValues(alpha: 0.3),
             ),
             const SizedBox(height: 16),
             Text(
               'No members available',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.white.withOpacity(0.7),
+                color: Colors.white.withValues(alpha: 0.7),
               ),
             ),
           ],
@@ -189,7 +187,7 @@ class CoalitionModal extends StatelessWidget {
     }
 
     // Sort users by score (highest first)
-    final sortedUsers = List<CoalitionUserModel>.from(users)
+    final sortedUsers = List.from(users)
       ..sort((a, b) => b.score.compareTo(a.score));
 
     return ListView.builder(
@@ -202,7 +200,7 @@ class CoalitionModal extends StatelessWidget {
     );
   }
 
-  Widget _buildUserCard(CoalitionUserModel coalitionUser, int rank) {
+  Widget _buildUserCard(dynamic coalitionUser, int rank) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -212,12 +210,12 @@ class CoalitionModal extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Colors.white.withOpacity(0.1),
-            Colors.white.withOpacity(0.05),
+            Colors.white.withValues(alpha: 0.1),
+            Colors.white.withValues(alpha: 0.05),
           ],
         ),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -255,7 +253,7 @@ class CoalitionModal extends StatelessWidget {
               gradient: LinearGradient(
                 colors: [
                   Color(coalition.colorValue),
-                  Color(coalition.colorValue).withOpacity(0.7),
+                  Color(coalition.colorValue).withValues(alpha: 0.7),
                 ],
               ),
             ),
@@ -285,7 +283,7 @@ class CoalitionModal extends StatelessWidget {
                   coalitionUser.userLogin,
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -319,7 +317,7 @@ class CoalitionModal extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
-              color: Color(coalition.colorValue).withOpacity(0.2),
+              color: Color(coalition.colorValue).withValues(alpha: 0.2),
             ),
             child: Text(
               '${coalitionUser.score}',
@@ -334,8 +332,6 @@ class CoalitionModal extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _buildUserImage(String? url) {
     if (url == null || url.isEmpty) {
