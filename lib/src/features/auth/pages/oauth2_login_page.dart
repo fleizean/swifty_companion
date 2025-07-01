@@ -247,7 +247,7 @@ class _OAuth2LoginPageState extends State<OAuth2LoginPage>
             colors: [Color(0xFF00d4ff), Color(0xFF7209b7)],
           ).createShader(bounds),
           child: const Text(
-            'peer42',
+            'Peer42',
             style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.bold,
