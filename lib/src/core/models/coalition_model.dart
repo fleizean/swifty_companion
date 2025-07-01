@@ -1,7 +1,6 @@
 import 'package:peer42/src/core/models/coalition_user_model.dart';
 
 class CoalitionModel {
-
   CoalitionModel({
     required this.id,
     required this.name,
@@ -14,24 +13,36 @@ class CoalitionModel {
   });
 
   factory CoalitionModel.fromJson(Map<String, dynamic> json) {
-    List<CoalitionUserModel> usersList = [];
-    if (json['users'] != null && json['users'] is List) {
-      usersList = (json['users'] as List)
-          .map((userData) => CoalitionUserModel.fromJson(userData))
-          .toList();
-    }
+    try {      
+      List<CoalitionUserModel> usersList = [];
+      if (json['users'] != null && json['users'] is List) {
+        
+        for (var userData in json['users'] as List) {
+          try {
+            usersList.add(CoalitionUserModel.fromJson(userData as Map<String, dynamic>));
+          } catch (e) {
+            
+          }
+        }
+      }
 
-    return CoalitionModel(
-      id: (json['id'] as num?)?.toInt() ?? 0,
-      name: json['name'] as String? ?? '',
-      imageUrl: json['image_url'] as String? ?? '',
-      color: json['color'] as String? ?? '#000000',
-      coverUrl: json['cover_url'] as String?,
-      score: (json['score'] as num?)?.toInt() ?? 0,
-      slug: json['slug'] as String? ?? '',
-      users: usersList,
-    );
+      final result = CoalitionModel(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        name: json['name']?.toString() ?? '',
+        imageUrl: json['image_url']?.toString() ?? '',
+        color: json['color']?.toString() ?? '#000000',
+        coverUrl: json['cover_url']?.toString(),
+        score: (json['score'] as num?)?.toInt() ?? 0,
+        slug: json['slug']?.toString() ?? '',
+        users: usersList,
+      );
+      
+      return result;
+    } catch (e) {
+      rethrow;
+    }
   }
+
   final int id;
   final String name;
   final String imageUrl;

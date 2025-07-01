@@ -9,19 +9,25 @@ class CoalitionUserModel {
   });
 
   factory CoalitionUserModel.fromJson(Map<String, dynamic> json) {
-    Map<String, dynamic>? userData;
-    if (json['user'] != null) {
-      userData = json['user'] as Map<String, dynamic>;
-    }
+    try {      
+      Map<String, dynamic>? userData;
+      if (json['user'] != null) {
+        userData = json['user'] as Map<String, dynamic>;
+      }
 
-    return CoalitionUserModel(
-      id: json['id'] as int,
-      score: (json['score'] as num?)?.toInt() ?? 0,
-      rank: (json['rank'] as num?)?.toInt() ?? 0,
-      coalitionId: json['coalition_id'] as int,
-      userId: json['user_id'] as String,
-      user: userData,
-    );
+      final result = CoalitionUserModel(
+        id: (json['id'] as num?)?.toInt() ?? 0,
+        score: (json['score'] as num?)?.toInt() ?? 0,
+        rank: (json['rank'] as num?)?.toInt() ?? 0,
+        coalitionId: (json['coalition_id'] as num?)?.toInt() ?? 0,
+        userId: json['user_id']?.toString() ?? '',
+        user: userData,
+      );
+      
+      return result;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   final int id;
@@ -31,8 +37,8 @@ class CoalitionUserModel {
   final String userId;
   final Map<String, dynamic>? user;
 
-    String get userLogin => user?['login'] ?? 'Unknown';
-    String get userDisplayName => user?['displayname'] ?? user?['login'] ?? 'Unknown';
-    String? get userImageUrl => user?['image']?['link'];
-    double get userLevel => (user?['level'] as num?)?.toDouble() ?? 0.0;
+  String get userLogin => user?['login']?.toString() ?? 'Unknown';
+  String get userDisplayName => user?['displayname']?.toString() ?? user?['login']?.toString() ?? 'Unknown';
+  String? get userImageUrl => user?['image']?['link']?.toString();
+  double get userLevel => (user?['level'] as num?)?.toDouble() ?? 0.0;
 }

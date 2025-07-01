@@ -180,6 +180,34 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             ),
           ),
           GestureDetector(
+            onTap: _navigateToMyProfile,
+            child: Container(
+              width: 44,
+              height: 44,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Colors.white.withOpacity(0.1),
+                    Colors.white.withOpacity(0.05),
+                  ],
+                ),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.2),
+                  width: 1,
+                ),
+              ),
+              child: const Icon(
+                Icons.person,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+          GestureDetector(
             onTap: () => Navigator.pushNamed(context, '/settings'),
             child: Container(
               width: 44,
@@ -210,6 +238,48 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
       ),
     );
   }
+
+  Future<void> _navigateToMyProfile() async {
+    // Loading göster
+    setState(() => _isLoading = true);
+    
+    try {
+      // Kendi kullanıcı bilgilerini al
+      final currentUser = await _apiService.getCurrentUser();
+      
+      if (mounted) {
+        // Profile sayfasına git
+        Navigator.pushNamed(
+          context,
+          '/profile',
+          arguments: {'user': currentUser},
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        _showSnackBar('Failed to load your profile: $e', isError: true);
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showSnackBar(String message, {bool isError = false}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? const Color(0xFFff006e) : const Color(0xFF00d4ff),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
+  }
+
+
 
   Widget _buildSearchBar() {
     return AnimatedBuilder(

@@ -144,45 +144,34 @@ class FuturisticProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildCoalitionImage(String imageUrl) {
-  if (imageUrl.toLowerCase().endsWith('.svg')) {
-    // Handle SVG
-    return SvgPicture.network(
-      imageUrl,
-      fit: BoxFit.cover,
-      placeholderBuilder: (context) => Container(
-        color: Colors.transparent,
-        child: const Icon(
-          Icons.shield,
-          color: Colors.white,
-          size: 20,
+    Widget _buildCoalitionImage(String imageUrl) {
+    if (imageUrl.toLowerCase().endsWith('.svg')) {
+      // For SVG images, use a precache approach with a smoother transition
+      return SvgPicture.network(
+        imageUrl,
+        fit: BoxFit.cover,
+        // Remove the placeholderBuilder to avoid showing placeholder first
+        // Instead, handle errors more gracefully
+        placeholderBuilder: (context) => const SizedBox.shrink(),
+      );
+    } else {
+      // For regular images, use CachedNetworkImage with similar behavior
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
+        fit: BoxFit.cover,
+        // Use transparent placeholder instead of icon
+        placeholder: (context, url) => const SizedBox.shrink(),
+        errorWidget: (context, url, error) => Container(
+          color: Colors.transparent,
+          child: const Icon(
+            Icons.shield,
+            color: Colors.white,
+            size: 20,
+          ),
         ),
-      ),
-    );
-  } else {
-    // Handle regular images  
-    return CachedNetworkImage(
-      imageUrl: imageUrl,
-      fit: BoxFit.cover,
-      placeholder: (context, url) => Container(
-        color: Colors.transparent,
-        child: const Icon(
-          Icons.shield,
-          color: Colors.white,
-          size: 20,
-        ),
-      ),
-      errorWidget: (context, url, error) => Container(
-        color: Colors.transparent,
-        child: const Icon(
-          Icons.shield,
-          color: Colors.white,
-          size: 20,
-        ),
-      ),
-    );
+      );
+    }
   }
-}
 
 
   Widget _buildUserInfo() {

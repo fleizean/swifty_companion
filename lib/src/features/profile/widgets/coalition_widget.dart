@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../../core/models/coalition_model.dart';
 import '../../../core/models/coalition_user_model.dart';
 
 class CoalitionModal extends StatelessWidget {
-  final CoalitionModel coalition;
+  final CoalitionUserModel coalition;
 
   const CoalitionModal({
     super.key,
@@ -14,6 +13,8 @@ class CoalitionModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    final bottomSafeArea = MediaQuery.of(context).padding.bottom;
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
       decoration: BoxDecoration(
@@ -28,8 +29,11 @@ class CoalitionModal extends StatelessWidget {
           ],
         ),
       ),
-      child: Column(
-        children: [
+      child: SafeArea(
+        top: false,
+        bottom: true,
+        child: Column(
+          children: [
           // Handle bar
           Container(
             margin: const EdgeInsets.only(top: 12),
@@ -46,9 +50,14 @@ class CoalitionModal extends StatelessWidget {
           
           // Users List
           Expanded(
-            child: _buildUsersList(),
+            child: Padding(
+              // Add bottom padding to the list
+              padding: EdgeInsets.only(bottom: bottomSafeArea > 0 ? 0 : 20),
+              child: _buildUsersList(),
+            ),
           ),
         ],
+        ),
       ),
     );
   }
@@ -59,34 +68,52 @@ class CoalitionModal extends StatelessWidget {
       child: Column(
         children: [
           // Coalition Logo
-          Container(
+            Container(
             width: 80,
             height: 80,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               gradient: LinearGradient(
-                colors: [
-                  Color(coalition.colorValue),
-                  Color(coalition.colorValue).withOpacity(0.7),
-                ],
+              colors: [
+                Color(coalition.colorValue),
+                Color(coalition.colorValue).withOpacity(0.7),
+              ],
               ),
               boxShadow: [
-                BoxShadow(
-                  color: Color(coalition.colorValue).withOpacity(0.3),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                ),
+              BoxShadow(
+                color: Color(coalition.colorValue).withOpacity(0.3),
+                blurRadius: 20,
+                spreadRadius: 2,
+              ),
               ],
             ),
-            child: Center(
-              child: Text(
-                coalition.name.isNotEmpty ? coalition.name[0].toUpperCase() : 'C',
-                style: const TextStyle(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: coalition.imageUrl != null && coalition.imageUrl!.isNotEmpty
+              ? SvgPicture.network(
+                coalition.imageUrl!,
+                fit: BoxFit.cover,
+                placeholderBuilder: (context) => Center(
+                  child: Text(
+                  coalition.name.isNotEmpty ? coalition.name[0].toUpperCase() : 'C',
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                  ),
+                ),
+                )
+              : Center(
+                child: Text(
+                  coalition.name.isNotEmpty ? coalition.name[0].toUpperCase() : 'C',
+                  style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
+                  ),
                 ),
-              ),
+                ),
             ),
           ),
           const SizedBox(height: 16),
@@ -166,7 +193,7 @@ class CoalitionModal extends StatelessWidget {
       ..sort((a, b) => b.score.compareTo(a.score));
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 24),
       itemCount: sortedUsers.length,
       itemBuilder: (context, index) {
         final user = sortedUsers[index];
