@@ -1,4 +1,6 @@
+// lib/src/features/settings/pages/settings_page.dart
 import 'package:flutter/material.dart';
+import 'package:peer42/src/core/utils/app_navigator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/services/oauth2_service.dart';
 
@@ -16,6 +18,11 @@ class SettingsPageState extends State<SettingsPage>
   bool _isLoading = false;
   late AnimationController _backgroundController;
   late Animation<double> _backgroundAnimation;
+
+  // Scope debug state variables
+  List<String> _currentScopes = [];
+  bool _hasProjectsScope = false;
+  bool _isLoadingScopes = false;
 
   @override
   void initState() {
@@ -41,9 +48,65 @@ class SettingsPageState extends State<SettingsPage>
     super.dispose();
   }
 
+  // Load scope information
+  Future<void> _loadScopeInfo() async {
+    setState(() {
+      _isLoadingScopes = true;
+    });
+
+    try {
+      final scopes = await _oauth2Service.getCurrentScopes();
+      final hasProjects = await _oauth2Service.hasProjectsScope();
+      
+      print('🔍 Current scopes: $scopes');
+      print('📋 Has projects scope: $hasProjects');
+      
+      if (hasProjects) {
+        print('✅ Evaluation slots should work!');
+        _showSnackBar('✅ API Scopes: Projects permission is active', isError: false);
+      } else {
+        print('❌ Evaluation slots will show 403 error');
+        _showSnackBar('❌ API Scopes: Projects permission is missing!', isError: true);
+      }
+      
+      _showSnackBar('Current scopes: ${scopes.join(", ")}', 
+        isError: false, 
+        duration: const Duration(seconds: 5)
+      );
+      
+      setState(() {
+        _currentScopes = scopes;
+        _hasProjectsScope = hasProjects;
+      });
+    } catch (e) {
+      print('❗ Error loading scope info: $e');
+      _showSnackBar('❗ Error loading API scopes: $e', isError: true);
+    } finally {
+      setState(() {
+        _isLoadingScopes = false;
+      });
+    }
+  }
+
+  void _showSnackBar(String message, {
+    bool isError = false, 
+    Duration duration = const Duration(seconds: 3)
+  }) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? Colors.red : Colors.green,
+        behavior: SnackBarBehavior.floating,
+        duration: duration,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
   Future<void> _logout() async {
     final confirm = await _showLogoutDialog();
-    // Null check eklendi - eğer null dönerse false olarak kabul et
     if (confirm != true) return;
 
     setState(() => _isLoading = true);
@@ -53,7 +116,7 @@ class SettingsPageState extends State<SettingsPage>
       if (mounted) {
         Navigator.pushNamedAndRemoveUntil(
           context,
-          '/login', // Route name düzeltildi - '/oauth2-login' yerine '/login'
+          '/login',
           (route) => false,
         );
       }
@@ -103,22 +166,7 @@ class SettingsPageState extends State<SettingsPage>
       ),
     );
 
-    // Null check ile false döndür
     return result ?? false;
-  }
-
-  void _showSnackBar(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor:
-            isError ? const Color(0xFFff006e) : const Color(0xFF00d4ff),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-      ),
-    );
   }
 
   @override
@@ -169,7 +217,7 @@ class SettingsPageState extends State<SettingsPage>
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            onTap: () => AppNavigator.safeNavigateBack(context),
             child: Container(
               width: 44,
               height: 44,
@@ -209,6 +257,46 @@ class SettingsPageState extends State<SettingsPage>
               ),
             ),
           ),
+          const Spacer(),
+          // API Debug Button - Always visible
+          GestureDetector(
+            onTap: _loadScopeInfo,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF00d4ff), Color(0xFF7209b7)],
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _isLoadingScopes 
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Icon(Icons.api, color: Colors.white, size: 16),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'API Check',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -228,11 +316,19 @@ class SettingsPageState extends State<SettingsPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // API Debug Section - Always visible
+          _buildSectionTitle('API Status'),
+          const SizedBox(height: 16),
+          _buildApiStatusCard(),
           const SizedBox(height: 32),
+          
+          // Account Section
           _buildSectionTitle('Account'),
           const SizedBox(height: 16),
           _buildAccountSection(),
           const SizedBox(height: 32),
+          
+          // About Section
           _buildSectionTitle('About'),
           const SizedBox(height: 16),
           _buildAboutSection(),
@@ -248,6 +344,212 @@ class SettingsPageState extends State<SettingsPage>
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: Colors.white.withOpacity(0.9),
+      ),
+    );
+  }
+
+  Widget _buildApiStatusCard() {
+    Color statusColor = _currentScopes.isEmpty 
+        ? Colors.grey 
+        : (_hasProjectsScope ? Colors.green : Colors.red);
+        
+    String statusText = _currentScopes.isEmpty
+        ? "Tap API Check to see your permissions"
+        : (_hasProjectsScope 
+            ? "Projects permission active ✅" 
+            : "Projects permission missing ❌");
+
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withOpacity(0.05),
+            Colors.white.withOpacity(0.02),
+          ],
+        ),
+        border: Border.all(
+          color: statusColor.withOpacity(0.3),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF00d4ff), Color(0xFF7209b7)],
+                  ),
+                ),
+                child: const Icon(
+                  Icons.api,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'API Permission Status',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      statusText,
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: statusColor.withOpacity(0.9),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          
+          if (_currentScopes.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            const Divider(color: Colors.white10),
+            const SizedBox(height: 16),
+            
+            Text(
+              'Available Permissions:',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.white.withOpacity(0.9),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: _currentScopes.map((scope) {
+                final isProjectsScope = scope == 'projects';
+                return Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isProjectsScope 
+                        ? Colors.green.withOpacity(0.2)
+                        : const Color(0xFF00d4ff).withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isProjectsScope 
+                          ? Colors.green
+                          : const Color(0xFF00d4ff),
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    scope,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: isProjectsScope 
+                          ? Colors.green
+                          : const Color(0xFF00d4ff),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+          
+          const SizedBox(height: 16),
+          
+          // Action button
+          ElevatedButton.icon(
+            onPressed: _loadScopeInfo,
+            icon: _isLoadingScopes 
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  )
+                : const Icon(Icons.refresh, size: 16),
+            label: Text(_isLoadingScopes ? 'Checking...' : 'Check API Permissions'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF00d4ff),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+          
+          // Warning for missing projects scope
+          if (_currentScopes.isNotEmpty && !_hasProjectsScope) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.warning, color: Colors.red, size: 18),
+                      SizedBox(width: 8),
+                      Text(
+                        'Permission Issue Detected',
+                        style: TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Projects scope is required for evaluation slots. Please logout and login again with all permissions.',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  ElevatedButton(
+                    onPressed: () async {
+                      await _oauth2Service.logout();
+                      Navigator.pushReplacementNamed(context, '/login');
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 36),
+                    ),
+                    child: const Text('Logout and Re-login'),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -312,12 +614,12 @@ class SettingsPageState extends State<SettingsPage>
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.white.withOpacity(0.1),
               Colors.white.withOpacity(0.05),
+              Colors.white.withOpacity(0.02),
             ],
           ),
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withOpacity(0.1),
             width: 1,
           ),
         ),
@@ -328,7 +630,11 @@ class SettingsPageState extends State<SettingsPage>
               height: 48,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
-                gradient: LinearGradient(colors: iconGradient),
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: iconGradient,
+                ),
               ),
               child: Icon(
                 icon,
@@ -353,7 +659,7 @@ class SettingsPageState extends State<SettingsPage>
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 13,
                       color: Colors.white.withOpacity(0.7),
                     ),
                   ),

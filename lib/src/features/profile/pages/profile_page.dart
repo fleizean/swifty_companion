@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peer42/src/core/utils/app_navigator.dart';
 import 'package:peer42/src/features/profile/widgets/coalition_widget.dart';
 import 'package:peer42/src/features/profile/widgets/profile_header.dart';
 import 'package:peer42/src/features/profile/widgets/profile_info_section.dart';
@@ -363,7 +364,7 @@ class _ProfilePageState extends State<ProfilePage>
     }
     
     // Loading dialog'u kapat
-    if (mounted) Navigator.pop(context);
+    if (mounted) AppNavigator.safeNavigateBack(context);
     
     if (coalitionWithUsers != null && mounted) {
       
@@ -378,7 +379,7 @@ class _ProfilePageState extends State<ProfilePage>
     }
   } catch (e) {
     
-    if (mounted) Navigator.pop(context);
+    if (mounted) AppNavigator.safeNavigateBack(context);
     if (mounted) _showErrorDialog('Error: $e');
   }
 }
@@ -413,7 +414,7 @@ void _showErrorDialog(String message) {
       content: Text(message, style: const TextStyle(color: Colors.white70)),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => AppNavigator.safeNavigateBack(context),
           child: const Text('OK', style: TextStyle(color: Color(0xFF00d4ff))),
         ),
       ],
@@ -479,7 +480,7 @@ void _showErrorDialog(String message) {
               ),
               const SizedBox(height: 32),
               GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () => AppNavigator.safeNavigateBack(context),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 32,
@@ -516,7 +517,7 @@ void _showErrorDialog(String message) {
       backgroundColor: Colors.transparent,
       elevation: 0,
       leading: GestureDetector(
-        onTap: () => Navigator.pop(context),
+        onTap: () => AppNavigator.safeNavigateBack(context),
         child: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(

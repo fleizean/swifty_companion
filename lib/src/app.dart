@@ -1,7 +1,7 @@
-// lib/src/app.dart - Basitleştirilmiş flow
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:peer42/src/features/evaluation/pages/evaluation_slot_page.dart';
 
 import 'core/services/oauth2_service.dart';
 import 'core/themes/app_theme.dart';
@@ -10,6 +10,7 @@ import 'features/auth/pages/oauth2_login_page.dart';
 import 'features/profile/pages/profile_page.dart';
 import 'features/search/pages/search_page.dart';
 import 'features/settings/pages/settings_page.dart';
+import 'features/main/pages/main_navigation_page.dart'; // ← YENİ EKLENEN
 
 class Peer42App extends StatelessWidget {
   const Peer42App({super.key});
@@ -32,10 +33,12 @@ class Peer42App extends StatelessWidget {
       navigatorKey: AppNavigator.navigatorKey,
       home: const SplashScreen(),
       routes: {
-        '/home': (context) => const SearchPage(),
+        '/home': (context) => const MainNavigationPage(), // ← DEĞİŞTİ: SearchPage yerine MainNavigationPage
+        '/search': (context) => const SearchPage(), // ← Artık direkt erişim (opsiyonel)
         '/profile': (context) => const ProfilePage(),
         '/settings': (context) => const SettingsPage(),
         '/login': (context) => const OAuth2LoginPage(),
+        '/evaluation-slots': (context) => const EvaluationSlotPage(),
       },
     );
   }
@@ -66,7 +69,7 @@ class SplashScreenState extends State<SplashScreen> {
       
       if (mounted) {
         if (isAuthenticated) {
-          // User is logged in, go to home
+          // User is logged in, go to main navigation (bottom nav ile search sayfası)
           Navigator.pushReplacementNamed(context, '/home');
         } else {
           // User needs to login

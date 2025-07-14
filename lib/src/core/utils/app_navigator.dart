@@ -8,6 +8,33 @@ class AppNavigator {
   static void navigateToHome() {
     navigator?.pushNamedAndRemoveUntil('/home', (route) => false);
   }
+
+  static void goToHome() {
+    navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      '/home',
+      (route) => false,
+    );
+  }
+
+  static void goToLogin() {
+    navigatorKey.currentState?.pushNamedAndRemoveUntil(
+      '/login',
+      (route) => false,
+    );
+  }
+
+  static void safeNavigateBack(BuildContext context) {
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
+
+
+  static void goToEvaluationSlots() {
+    navigatorKey.currentState?.pushNamed('/evaluation-slots');
+  }
   
   static void navigateToSettings({bool isInitialSetup = false}) {
     navigator?.pushNamed(

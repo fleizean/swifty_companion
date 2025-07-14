@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:peer42/src/core/utils/app_navigator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/services/oauth2_service.dart';
 
@@ -48,6 +49,11 @@ class _OAuth2LoginPageState extends State<OAuth2LoginPage>
       parent: _buttonController,
       curve: Curves.easeInOut,
     ));
+  }
+
+  void _onLoginSuccess() {
+    // Login başarılı olduğunda ana navigation sayfasına git
+    Navigator.pushReplacementNamed(context, '/home'); // MainNavigationPage açılır
   }
 
   @override
@@ -146,7 +152,7 @@ class _OAuth2LoginPageState extends State<OAuth2LoginPage>
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => AppNavigator.safeNavigateBack(context),
             child: const Text(
               'OK',
               style: TextStyle(color: Color(0xFF00d4ff)),

@@ -1,3 +1,5 @@
+// lib/src/core/services/oauth2_service.dart - SCOPE FIX
+
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
@@ -9,7 +11,7 @@ class OAuth2Service {
   static const String _baseUrl = 'https://api.intra.42.fr';
   
   final AppLinks _appLinks = AppLinks();
-  String? _currentState; // State'i saklayacağız
+  String? _currentState;
   
   // DotEnv'den credentials al
   String get _clientId => dotenv.env['CLIENT_ID'] ?? '';
@@ -23,15 +25,16 @@ class OAuth2Service {
     return List.generate(32, (index) => chars[random.nextInt(chars.length)]).join();
   }
   
-  // OAuth2 authorization URL'ini oluştur
+  // OAuth2 authorization URL'ini oluştur - SCOPE EKLENDİ
   String buildAuthorizationUrl() {
-    _currentState = _generateState(); // State'i oluştur ve sakla
+    _currentState = _generateState();
     
     final params = {
       'client_id': _clientId,
       'redirect_uri': _redirectUri,
       'response_type': 'code',
-      'state': _currentState!, // State'i ekle
+      'state': _currentState!,
+      'scope': 'public projects forum profile elearning', // ← SCOPE EKLENDİ!
     };
     
     final uri = Uri.parse('$_baseUrl/oauth/authorize');
@@ -41,12 +44,12 @@ class OAuth2Service {
   // Deep link callback'ini dinle
   Stream<Uri> get callbackStream => _appLinks.uriLinkStream;
   
-  // Authorization code ile access token al
+  // Authorization code ile access token al - SCOPE EKLENDİ
   Future<Map<String, dynamic>> exchangeCodeForToken({
     required String code,
     String? state,
   }) async {
-    // State kontrolü (opsiyonel ama önerilen)
+    // State kontrolü
     if (state != null && _currentState != null && state != _currentState) {
       throw Exception('Invalid state parameter. Possible CSRF attack.');
     }
@@ -60,6 +63,7 @@ class OAuth2Service {
         'client_secret': _clientSecret,
         'code': code,
         'redirect_uri': _redirectUri,
+        'scope': 'public projects forum profile elearning', // ← SCOPE EKLENDİ!
       },
     );
     
@@ -108,7 +112,7 @@ class OAuth2Service {
     return token;
   }
   
-  // Refresh token ile yeni access token al
+  // Refresh token ile yeni access token al - SCOPE EKLENDİ
   Future<String?> refreshToken() async {
     final prefs = await SharedPreferences.getInstance();
     final refreshToken = prefs.getString('refresh_token');
@@ -126,6 +130,7 @@ class OAuth2Service {
           'refresh_token': refreshToken,
           'client_id': _clientId,
           'client_secret': _clientSecret,
+          'scope': 'public projects forum profile elearning', // ← SCOPE EKLENDİ!
         },
       );
       
@@ -180,5 +185,34 @@ class OAuth2Service {
     } catch (e) {
       return false;
     }
+  }
+  
+  // Current token'ın scope'larını kontrol et
+  Future<List<String>> getCurrentScopes() async {
+    try {
+      final token = await getAccessToken();
+      if (token == null) return [];
+      
+      final response = await http.get(
+        Uri.parse('$_baseUrl/oauth/token/info'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final scopes = data['scope'] as String? ?? '';
+        return scopes.split(' ').where((s) => s.isNotEmpty).toList();
+      }
+    } catch (e) {
+      print('Error getting scopes: $e');
+    }
+    
+    return [];
+  }
+  
+  // Projects scope'u var mı kontrol et
+  Future<bool> hasProjectsScope() async {
+    final scopes = await getCurrentScopes();
+    return scopes.contains('projects');
   }
 }
