@@ -260,7 +260,7 @@ class _OAuth2LoginPageState extends State<OAuth2LoginPage>
           'Connect to your 42 journey',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -281,7 +281,7 @@ class _OAuth2LoginPageState extends State<OAuth2LoginPage>
           ],
         ),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
@@ -307,7 +307,7 @@ class _OAuth2LoginPageState extends State<OAuth2LoginPage>
             'Sign in with your 42 account to continue',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -425,7 +425,7 @@ class _OAuth2LoginPageState extends State<OAuth2LoginPage>
           'Secure OAuth2 Authentication',
           style: TextStyle(
             fontSize: 12,
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
           ),
         ),
       ],

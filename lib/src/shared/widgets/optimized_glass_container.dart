@@ -27,7 +27,7 @@ class OptimizedGlassContainer extends StatelessWidget {
         color: color ?? Colors.white.withOpacity(0.1),
         borderRadius: BorderRadius.circular(borderRadius),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
       ),

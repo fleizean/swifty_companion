@@ -33,7 +33,7 @@ class FuturisticProfileHeader extends StatelessWidget {
           ],
         ),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
         boxShadow: [
@@ -196,7 +196,7 @@ class FuturisticProfileHeader extends StatelessWidget {
           '@${user.login}',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.white.withOpacity(0.7),
+            color: Colors.white.withValues(alpha: 0.7),
           ),
         ),
         if (coalition != null) ...[
@@ -252,7 +252,7 @@ class FuturisticProfileHeader extends StatelessWidget {
               'Level ${user.level.floor()}',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -260,7 +260,7 @@ class FuturisticProfileHeader extends StatelessWidget {
               '${(progress * 100).toInt()}%',
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.8),
+                color: Colors.white.withValues(alpha: 0.8),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -272,7 +272,7 @@ class FuturisticProfileHeader extends StatelessWidget {
           height: 8,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
           ),
           child: Stack(
             children: [

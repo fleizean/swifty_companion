@@ -29,7 +29,7 @@ class FuturisticStatCard extends StatelessWidget {
           ],
         ),
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           width: 1,
         ),
       ),
@@ -69,7 +69,7 @@ class FuturisticStatCard extends StatelessWidget {
             title,
             style: TextStyle(
               fontSize: 10,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
         ],

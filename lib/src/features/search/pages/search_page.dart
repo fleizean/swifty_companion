@@ -173,7 +173,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   'Find students and explore their journey',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.7),
+                    color: Colors.white.withValues(alpha: 0.7),
                   ),
                 ),
               ],
@@ -196,7 +196,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   ],
                 ),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -223,7 +223,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   ],
                 ),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -303,7 +303,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   ],
                 ),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -318,7 +318,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                   decoration: InputDecoration(
                     hintText: 'Search for students...',
                     hintStyle: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                       fontSize: 16,
                     ),
                     prefixIcon: Container(
@@ -359,7 +359,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                                 },
                                 icon: Icon(
                                   Icons.clear,
-                                  color: Colors.white.withOpacity(0.6),
+                                  color: Colors.white.withValues(alpha: 0.6),
                                 ),
                               )
                             : null,
@@ -414,7 +414,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                 ],
               ),
               border: Border.all(
-                color: Colors.white.withOpacity(0.1),
+                color: Colors.white.withValues(alpha: 0.1),
                 width: 1,
               ),
             ),
@@ -438,7 +438,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             'Enter a username or display name to find students',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
             textAlign: TextAlign.center,
           ),
@@ -479,7 +479,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             height: 100,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.1),
+              color: Colors.white.withValues(alpha: 0.1),
             ),
             child: const Icon(
               Icons.person_off,
@@ -501,7 +501,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
             'Try a different search term',
             style: TextStyle(
               fontSize: 14,
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
             ),
           ),
         ],
@@ -548,7 +548,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                       ],
                     ),
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       width: 1,
                     ),
                     boxShadow: [
@@ -622,7 +622,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                               user.login,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.white.withValues(alpha: 0.7),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -655,7 +655,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                                 'No level information',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.white.withOpacity(0.6),
+                                  color: Colors.white.withValues(alpha: 0.6),
                                 ),
                               ),
                             ],
@@ -667,7 +667,7 @@ class _SearchPageState extends State<SearchPage> with TickerProviderStateMixin {
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(8),
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                         ),
                         child: const Icon(
                           Icons.arrow_forward_ios,

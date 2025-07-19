@@ -184,7 +184,7 @@ class SettingsPageState extends State<SettingsPage>
                   ],
                 ),
                 border: Border.all(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   width: 1,
                 ),
               ),
@@ -247,7 +247,7 @@ class SettingsPageState extends State<SettingsPage>
       style: TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: Colors.white.withOpacity(0.9),
+        color: Colors.white.withValues(alpha: 0.9),
       ),
     );
   }
@@ -317,7 +317,7 @@ class SettingsPageState extends State<SettingsPage>
             ],
           ),
           border: Border.all(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.white.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -354,7 +354,7 @@ class SettingsPageState extends State<SettingsPage>
                     subtitle,
                     style: TextStyle(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.7),
+                      color: Colors.white.withValues(alpha: 0.7),
                     ),
                   ),
                 ],
@@ -363,7 +363,7 @@ class SettingsPageState extends State<SettingsPage>
             if (onTap != null)
               Icon(
                 Icons.arrow_forward_ios,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
                 size: 16,
               ),
           ],
