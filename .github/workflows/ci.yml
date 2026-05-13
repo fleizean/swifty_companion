@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main, develop ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
   schedule:
     # Her ayın 1'inde çalışır (Secret hatırlatması için)
     - cron: '0 0 1 * *'
