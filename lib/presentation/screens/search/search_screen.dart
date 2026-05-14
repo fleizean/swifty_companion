@@ -11,6 +11,7 @@ import 'widgets/search_input.dart';
 import 'widgets/search_suggestions_list.dart';
 import 'widgets/recent_searches_section.dart';
 import 'widgets/search_empty_state.dart';
+import 'widgets/search_not_found.dart';
 
 /// Main search screen composing all search sub-widgets.
 ///
@@ -99,6 +100,11 @@ class _SearchBody extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       );
+    }
+
+    // Search was performed but returned no results
+    if (provider.hasSearched && provider.suggestions.isEmpty) {
+      return SearchNotFound(query: provider.query);
     }
 
     // Default: recent searches + empty state
