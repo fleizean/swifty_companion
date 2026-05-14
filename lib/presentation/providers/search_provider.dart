@@ -11,6 +11,7 @@ class SearchProvider extends ChangeNotifier {
   String _query = '';
   List<UserModel> _suggestions = [];
   bool _isLoading = false;
+  bool _hasSearched = false;
   AppException? _error;
   Timer? _debounce;
 
@@ -28,6 +29,7 @@ class SearchProvider extends ChangeNotifier {
   String get query => _query;
   List<UserModel> get suggestions => _suggestions;
   bool get isLoading => _isLoading;
+  bool get hasSearched => _hasSearched;
   AppException? get error => _error;
   bool get hasQuery => _query.isNotEmpty;
   List<String> get recentSearches => List.unmodifiable(_recentSearches);
@@ -39,6 +41,7 @@ class SearchProvider extends ChangeNotifier {
 
     if (value.length < 3) {
       _suggestions = [];
+      _hasSearched = false;
       notifyListeners();
       return;
     }
@@ -52,6 +55,7 @@ class SearchProvider extends ChangeNotifier {
     final cached = _searchCache[query.toLowerCase()];
     if (cached != null && !cached.isExpired) {
       _suggestions = cached.results;
+      _hasSearched = true;
       _isLoading = false;
       notifyListeners();
       return;
@@ -61,6 +65,7 @@ class SearchProvider extends ChangeNotifier {
     notifyListeners();
     try {
       _suggestions = await _userRepository.searchUsers(query);
+      _hasSearched = true;
       // Store in cache
       _searchCache[query.toLowerCase()] = _CachedResult(
         results: _suggestions,
@@ -69,6 +74,7 @@ class SearchProvider extends ChangeNotifier {
     } on AppException catch (e) {
       _error = e;
       _suggestions = [];
+      _hasSearched = true;
     }
     _isLoading = false;
     notifyListeners();
@@ -93,6 +99,7 @@ class SearchProvider extends ChangeNotifier {
     _query = '';
     _suggestions = [];
     _error = null;
+    _hasSearched = false;
     _debounce?.cancel();
     notifyListeners();
   }
