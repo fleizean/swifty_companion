@@ -33,8 +33,21 @@ class AuthProvider extends ChangeNotifier {
 
     final token = await _tokenService.getToken();
     if (token != null && !token.isExpired) {
+      // Token still valid — proceed directly
       _state = AuthState.authenticated;
       _userLogin = await _tokenService.getUserLogin();
+    } else if (token != null && token.canRefresh) {
+      // Token expired but refresh token available — silently refresh
+      try {
+        final fresh = await _authRepository.refreshToken(token.refreshToken!);
+        await _tokenService.saveToken(fresh);
+        _state = AuthState.authenticated;
+        _userLogin = await _tokenService.getUserLogin();
+      } catch (_) {
+        // Refresh failed (e.g. revoked) — require re-login
+        await _tokenService.clearToken();
+        _state = AuthState.unauthenticated;
+      }
     } else {
       _state = AuthState.unauthenticated;
     }
